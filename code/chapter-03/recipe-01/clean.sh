@@ -1,0 +1,1 @@
+rm exit exit.o
