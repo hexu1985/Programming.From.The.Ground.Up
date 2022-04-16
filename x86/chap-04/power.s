@@ -15,25 +15,25 @@
 .globl _start
 
 _start:
-		push	$3				# push second argument
-		push	$2				# push first argument
+		pushl $3				# pushl second argument
+		pushl $2				# pushl first argument
 		call	power				# call the function
 
-		add	$8, %esp			# move stack pointer back
-		push	%eax				# save the first answer before
+		addl $8, %esp			# move stack pointer back
+		pushl %eax				# save the first answer before
 
-		push	$2				# push second argument
-		push	$5				# push first argument
+		pushl $2				# pushl second argument
+		pushl $5				# pushl first argument
 		call    power				# call the function
 
-		add     $8, %esp                        # move stack pointer back
-                pop	%ebx                            # The second answer is already
+		addl     $8, %esp                        # move stack pointer back
+                popl %ebx                            # The second answer is already
 							# in %eax. We saved the first
 							# answer onto the stack,
-							# so now we can just pop it
+							# so now we can just popl it
 							# out into %ebx
 
-		add	%eax, %ebx			# add them together the result is in %ebx
+		addl %eax, %ebx			# addl them together the result is in %ebx
 
 		movl	$0x01, %eax			# 1 is the exit() syscall
 		int	$0x80
@@ -59,29 +59,29 @@ _start:
 
 	power:
 
-		push	%ebp				# save old base pointer
-		mov	%esp, %ebp			# make stack pointer the base pointer
-		sub	$4, %esp			# get room for our local storage
+		pushl %ebp				# save old base pointer
+		movl %esp, %ebp			# make stack pointer the base pointer
+		subl $4, %esp			# get room for our local storage
 
-		mov	8(%ebp), %ebx			# put first argument in %ebx
-		mov	12(%ebp), %ecx			# put second argument in %ecx
+		movl 8(%ebp), %ebx			# put first argument in %ebx
+		movl 12(%ebp), %ecx			# put second argument in %ecx
 
-        	mov	%ebx, -4(%ebp)			# store current result
+        	movl %ebx, -4(%ebp)			# store current result
 
 	power_loop_start:
 
-		cmp	$1, %ecx			# if the power is 1, we are done	
+		cmpl $1, %ecx			# if the power is 1, we are done	
 		je	end_power			# 
 
-		mov	-4(%ebp), %eax			# move the current result into %eax
-		imul	%ebx, %eax			# multiply the current result by
-		mov	%eax, -4(%ebp)			# store the current result
-		dec	%ecx				# decrease the power
+		movl -4(%ebp), %eax			# move the current result into %eax
+		imull %ebx, %eax			# multiply the current result by
+		movl %eax, -4(%ebp)			# store the current result
+		decl %ecx				# decrease the power
 		jmp	power_loop_start		# run for the next power
 
 	end_power:
 
-		mov	-4(%ebp), %eax			# return value goes in %eax
-		mov	%ebp, %esp			# restore the stack pointer
-                pop	%ebp				# restore the base pointer
+		movl -4(%ebp), %eax			# return value goes in %eax
+		movl %ebp, %esp			# restore the stack pointer
+                popl %ebp				# restore the base pointer
 		ret
