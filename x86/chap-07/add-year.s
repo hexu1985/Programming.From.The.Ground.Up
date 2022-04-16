@@ -42,8 +42,8 @@ no_open_file_msg:	.ascii "Can't Open Input File\0"
 		# condition that the negative number
 		# represents.
 		
-		cmp	$0, %eax
-		jl	continue_processing
+		cmp $0, %eax
+		jg	continue_processing
 
 		push	$no_open_file_msg
 		push	$no_open_file_code

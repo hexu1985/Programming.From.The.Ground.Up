@@ -16,7 +16,7 @@
 .SUFFIXES:
 
 AS = as
-ASFLAGS += --32
+ASFLAGS += --32 -g
 LD = ld
 LDFLAGS += -melf_i386
 
