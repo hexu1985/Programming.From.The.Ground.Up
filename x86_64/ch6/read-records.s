@@ -1,7 +1,7 @@
 # as -g -o build/read-record.o ch6/read-record.s && as -g -o build/read-records.o ch6/read-records.s && as -g -o build/count-chars.o ch6/count-chars.s && ld -o build/read-records build/read-records.o build/read-record.o build/count-chars.o && ./build/read-records
 
-.include "ch6/linux.s"
-.include "ch6/record-def.s"
+.include "linux.s"
+.include "record-def.s"
 
 .section .data
 

@@ -1,5 +1,7 @@
-AS = as -g
-LD = ld
+AS = as
+ASFLAGS = -g
+LD = ld 
+LDFLAGS =
 
 SOURCES = $(shell ls *.s)
 PROGS = $(SOURCES:%.s=%)
@@ -11,8 +13,8 @@ clean:
 	$(RM) $(PROGS) *.o
 
 %.o:%.s
-	$(AS) -o $@ $<
+	$(AS) $(ASFLAGS) -o $@ $<
 
 $(PROGS): %: %.o
-	$(LD) -o $@ $<
+	$(LD) $(LDFLAGS) -o $@ $<
 

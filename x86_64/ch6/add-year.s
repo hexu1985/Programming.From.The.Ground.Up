@@ -1,7 +1,7 @@
 # as -g -o build/add-year.o ch6/add-year.s && as -g -o build/read-record.o ch6/read-record.s && as -g -o build/write-record.o ch6/write-record.s && ld -o build/add-year build/add-year.o build/read-record.o build/write-record.o && ./build/add-year
 
-.include "ch6/linux.s"
-.include "ch6/record-def.s"
+.include "linux.s"
+.include "record-def.s"
 
 .section .data
 
