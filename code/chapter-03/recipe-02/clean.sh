@@ -1,1 +1,0 @@
-rm maximum maximum.o
