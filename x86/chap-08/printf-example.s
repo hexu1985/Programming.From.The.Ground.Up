@@ -27,11 +27,11 @@ numberloved:	.long 3
 		# reverse order that they are listed in the
 		# function’s prototype.
 	
-		push	numberloved	# This is the %d
-		push	$personstring	# This is the second %s
-		push	$name		# This is the first %s
-		push	$firststring	# This is the format string
+		pushl numberloved	# This is the %d
+		pushl $personstring	# This is the second %s
+		pushl $name		# This is the first %s
+		pushl $firststring	# This is the format string
 				# in the prototype
 		call	printf
-		push	$0
+		pushl $0
 		call	exit

@@ -17,13 +17,13 @@ helloworld_end:	.equ	helloworld_len, helloworld_end - helloworld
 .globl	_start
 	_start:
 
-		mov	$STDOUT, %ebx
-		mov	$helloworld, %ecx
-		mov	$helloworld_len, %edx
-		mov	$SYS_WRITE, %eax
+		movl $STDOUT, %ebx
+		movl $helloworld, %ecx
+		movl $helloworld_len, %edx
+		movl $SYS_WRITE, %eax
 		int	$LINUX_SYSCALL
 		
-		mov	$0, %ebx
-		mov	$SYS_EXIT, %eax
+		movl $0, %ebx
+		movl $SYS_EXIT, %eax
 		int	$LINUX_SYSCALL
 
