@@ -3,7 +3,7 @@
 .section .data
 
 filename:
-    .ascii "ch5/heynow.txt\0"
+    .ascii "heynow.txt\0"
 message:
     .ascii "Hey diddle diddle!\0"
 
