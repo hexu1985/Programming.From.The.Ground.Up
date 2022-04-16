@@ -6,9 +6,6 @@
 #### 参考项目链接: 
 
 - <https://github.com/swseverance/programming-from-the-ground-up>
-- <https://github.com/foomur/programming-ground-up>
-- <https://github.com/bbyars/programming-from-the-ground-up>
-- <https://github.com/toonketels/ProgrammingFromTheGroundUp>
 - <https://github.com/andrewclarkii/Programming-from-ground-up>
 - <https://github.com/VasilyFomin/programming_from_ground_up/blob/master/Makefile>
 
