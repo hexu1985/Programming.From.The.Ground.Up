@@ -77,62 +77,62 @@
 
 ### INITIALIZE PROGRAM ###
 # save the stack pointer
-		mov	%esp, %ebp
+		movl %esp, %ebp
 
 # Allocate space for our file descriptors on the stack
-		sub	$ST_SIZE_RESERVE, %esp
+		subl $ST_SIZE_RESERVE, %esp
 
 	open_files:
 	open_fd_in:
 ### OPEN INPUT FILE ###
-		mov	$SYS_OPEN, %eax		# open syscall
-		mov	ST_ARGV_1(%ebp), %ebx	# input filename into %ebx
-		mov	$O_RDONLY, %ecx		# read-only flag
-		mov	$0666, %edx		# this doesn’t really matter for reading
+		movl $SYS_OPEN, %eax		# open syscall
+		movl ST_ARGV_1(%ebp), %ebx	# input filename into %ebx
+		movl $O_RDONLY, %ecx		# read-only flag
+		movl $0666, %edx		# this doesn’t really matter for reading
 		int	$LINUX_SYSCALL		# call Linux
 
 	store_fd_in:
 
-		mov	%eax, ST_FD_IN(%ebp)	# save the given file descriptor
+		movl %eax, ST_FD_IN(%ebp)	# save the given file descriptor
 	open_fd_out:
 ### OPEN OUTPUT FILE ###
-		mov	$SYS_OPEN, %eax			# open the file
-		mov	ST_ARGV_2(%ebp), %ebx		# output filename into %ebx
-		mov	$O_CREAT_WRONLY_TRUNC, %ecx	# flags for writing to the file
-		mov	$0666, %edx			# mode for new file (if it’s created)
+		movl $SYS_OPEN, %eax			# open the file
+		movl ST_ARGV_2(%ebp), %ebx		# output filename into %ebx
+		movl $O_CREAT_WRONLY_TRUNC, %ecx	# flags for writing to the file
+		movl $0666, %edx			# mode for new file (if it’s created)
 		int	$LINUX_SYSCALL			# call Linux
 
 	store_fd_out:
 		
-		mov	%eax, ST_FD_OUT(%ebp)		# store the file descriptor here
+		movl %eax, ST_FD_OUT(%ebp)		# store the file descriptor here
 ### BEGIN MAIN LOOP ###
 	read_loop_begin:
 ### READ IN A BLOCK FROM THE INPUT FILE ###
-		mov	$SYS_READ, %eax			# get the input file descriptor
-		mov	ST_FD_IN(%ebp), %ebx		# the location to read into
-		mov	$BUFFER_DATA, %ecx		# the location to read into
-		mov	$BUFFER_SIZE, %edx		# the size of the buffer
+		movl $SYS_READ, %eax			# get the input file descriptor
+		movl ST_FD_IN(%ebp), %ebx		# the location to read into
+		movl $BUFFER_DATA, %ecx		# the location to read into
+		movl $BUFFER_SIZE, %edx		# the size of the buffer
 		int	$LINUX_SYSCALL			# size of buffer read is returned in %eax
 
 ### EXIT IF WE’VE REACHED THE END ###
 
-		cmp	$END_OF_FILE, %eax		# check for end of file marker
+		cmpl $END_OF_FILE, %eax		# check for end of file marker
 		jle	end_loop			# if found or on error, go to the end
 
 	continue_read_loop:
 ### CONVERT THE BLOCK TO UPPER CASE ###
-		push	$BUFFER_DATA			# location of buffer
-		push	%eax				# size of the buffer
+		pushl $BUFFER_DATA			# location of buffer
+		pushl %eax				# size of the buffer
 		call	convert_to_upper
-		pop	%eax				# get the size back	
-		add	$4, %esp			# restore %esp
+		popl %eax				# get the size back	
+		addl $4, %esp			# restore %esp
 
 ### WRITE THE BLOCK OUT TO THE OUTPUT FILE ###
 
-		mov	%eax, %edx			# size of the buffer
-		mov	$SYS_WRITE, %eax		# 
-		mov	ST_FD_OUT(%ebp), %ebx		# file to use
-		mov	$BUFFER_DATA, %ecx		# location of the buffer
+		movl %eax, %edx			# size of the buffer
+		movl $SYS_WRITE, %eax		# 
+		movl ST_FD_OUT(%ebp), %ebx		# file to use
+		movl $BUFFER_DATA, %ecx		# location of the buffer
 		int	$LINUX_SYSCALL
 
 ### CONTINUE THE LOOP ###
@@ -144,16 +144,16 @@
 #        on these, because error conditions
 #        don’t signify anything special here
 
-		mov	$SYS_CLOSE, %eax
-		mov	ST_FD_OUT(%ebp), %ebx
+		movl $SYS_CLOSE, %eax
+		movl ST_FD_OUT(%ebp), %ebx
 		int	$LINUX_SYSCALL
 
-		mov	$SYS_CLOSE, %eax
-		mov	ST_FD_IN(%ebp), %ebx
+		movl $SYS_CLOSE, %eax
+		movl ST_FD_IN(%ebp), %ebx
 		int	$LINUX_SYSCALL
 ### EXIT ###
-		mov	$SYS_EXIT, %eax
-		mov	$0, %ebx
+		movl $SYS_EXIT, %eax
+		movl $0, %ebx
 		int	$LINUX_SYSCALL
 
 # PURPOSE: This function actually does the
@@ -192,41 +192,41 @@
 # actual buffer
 
 convert_to_upper:
-		push	%ebp
-		mov	%esp, %ebp
+		pushl %ebp
+		movl %esp, %ebp
 ### SET UP VARIABLES ###
-		mov	ST_BUFFER(%ebp), %eax
-		mov	ST_BUFFER_LEN(%ebp), %ebx
-		mov	$0, %edi
+		movl ST_BUFFER(%ebp), %eax
+		movl ST_BUFFER_LEN(%ebp), %ebx
+		movl $0, %edi
 		
 # if a buffer with zero length was given
 # to us, just leave
-		cmp	$0, %ebx
+		cmpl $0, %ebx
 		je	end_convert_loop
 
 convert_loop:
-		mov	(%eax,%edi,1), %cl	# get the current byte
+		movb (%eax,%edi,1), %cl	# get the current byte
 # go to the next byte unless it is between
 # ’a’ and ’z’
-		cmp	$LOWERCASE_A, %cl
+		cmpb $LOWERCASE_A, %cl
 		jl	next_byte
-		cmp	$LOWERCASE_Z, %cl
+		cmpb $LOWERCASE_Z, %cl
 		jg	next_byte
 
-		add	$UPPER_CONVERSION, %cl	# otherwise convert the byte to uppercase
-		mov	%cl, (%eax,%edi,1)	# and store it back
+		addb $UPPER_CONVERSION, %cl	# otherwise convert the byte to uppercase
+		movb %cl, (%eax,%edi,1)	# and store it back
 
 	next_byte:
 
-		inc	%edi			# next byte
-		cmp	%edi, %ebx		# continue unless
+		incl %edi			# next byte
+		cmpl %edi, %ebx		# continue unless
 						# we’ve reached the
 						# end
 		jne	convert_loop
 
 	end_convert_loop:
 
-		mov	%ebp, %esp		
-		pop	%ebp
+		movl %ebp, %esp		
+		popl %ebp
 		ret				# no return value, just leave
 
