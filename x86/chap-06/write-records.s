@@ -9,7 +9,7 @@
 # .rept is used to pad each item. .rept tells
 # the assembler to repeat the section between
 # .rept and .endr the number of times specified.
-# This is used in this program to add extra null
+# This is used in this program to addl extra null
 # characters at the end of each field to fill
 # it up
 
@@ -81,43 +81,43 @@ file_name:	.ascii	"test.dat\0"	#This is the name of the file we will write to
 	
 	_start:
 
-		mov	%esp, %ebp	# Copy the stack pointer to %ebp
-		sub	$4, %esp	# Allocate space to hold the file descriptor
+		movl %esp, %ebp	# Copy the stack pointer to %ebp
+		subl $4, %esp	# Allocate space to hold the file descriptor
 
-		mov	$SYS_OPEN, %eax	# open the file
-		mov	$file_name, %ebx	
-		mov	$0101, %ecx	# This says to create if it
+		movl $SYS_OPEN, %eax	# open the file
+		movl $file_name, %ebx	
+		movl $0101, %ecx	# This says to create if it
 					# doesn’t exist, and open for
 					# writing
-		mov	$0666, %edx
+		movl $0666, %edx
 		int	$LINUX_SYSCALL
 
-		mov	%eax, ST_FILE_DESCRIPTOR(%ebp)	# Store the file descriptor away
+		movl %eax, ST_FILE_DESCRIPTOR(%ebp)	# Store the file descriptor away
 
 		# Write the first record
-		push	ST_FILE_DESCRIPTOR(%ebp)
-		push	$record1
+		pushl ST_FILE_DESCRIPTOR(%ebp)
+		pushl $record1
 		call	write_record
-		add	$8, %esp
+		addl $8, %esp
 		
 		# Write the second record
-		push    ST_FILE_DESCRIPTOR(%ebp)
-                push    $record2
+		pushl    ST_FILE_DESCRIPTOR(%ebp)
+                pushl    $record2
                 call    write_record
-                add     $8, %esp
+                addl     $8, %esp
 
                 # Write the third record
-                push    ST_FILE_DESCRIPTOR(%ebp)
-                push    $record3
+                pushl    ST_FILE_DESCRIPTOR(%ebp)
+                pushl    $record3
                 call    write_record
-                add     $8, %esp
+                addl     $8, %esp
 
 		# Close the file descriptor
-		mov	$SYS_CLOSE, %eax
-		mov	ST_FILE_DESCRIPTOR(%ebp), %ebx
+		movl $SYS_CLOSE, %eax
+		movl ST_FILE_DESCRIPTOR(%ebp), %ebx
 		int	$LINUX_SYSCALL
 
 		# Exit the program
-		mov	$SYS_EXIT, %eax
-		mov	$0x00, %ebx
+		movl $SYS_EXIT, %eax
+		movl $0x00, %ebx
 		int     $LINUX_SYSCALL
