@@ -16,6 +16,8 @@ record_buffer_ptr:	.long	0
 
 	_start:
 
+		call	allocate_init
+
 # These are the locations on the stack where
 # we will store the input and output descriptors
 # (FYI - we could have used memory addresses in
@@ -113,11 +115,11 @@ record_buffer_ptr:	.long	0
 
 		xor	%ebx, %ebx				# our exit code
 	
-	exit:
-	
 		push	record_buffer_ptr
 		call	deallocate
 
+	exit:
+	
 		mov	$SYS_EXIT, %eax				# exit to OS
 		int	$LINUX_SYSCALL
 

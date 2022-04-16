@@ -73,24 +73,24 @@ current_break:	.long	0
 .type	allocate_init,	@function
 
 allocate_init:
-		push	%ebp		# standard function stuff
-		mov	%esp, %ebp
+		pushl %ebp		# standard function stuff
+		movl  %esp, %ebp
 
 # If the brk system call is called with 0 in %ebx, it
 # returns the last valid usable address
 
-		mov	$SYS_BRK, %eax	# find out where the break is
-		mov	$0, %ebx
+		movl $SYS_BRK, %eax	# find out where the break is
+		movl $0, %ebx
 		int	$LINUX_SYSCALL
 		
-		inc	%eax		# %eax now has the last valid
+		incl %eax		# %eax now has the last valid
 					# address, and we want the
 					# memory location after that
 
-		mov	%eax, current_break	# store the current break
-		mov	%eax, heap_begin
-		mov	%ebp, %esp
-		pop	%ebp		# exit the function
+		movl %eax, current_break	# store the current break
+		movl %eax, heap_begin
+		movl %ebp, %esp
+		popl %ebp		# exit the function
 
 		ret
 
@@ -134,38 +134,38 @@ allocate_init:
 
 allocate:
 
-		push	%ebp	# standard function stuff
-		mov	%esp, %ebp
+		pushl %ebp	# standard function stuff
+		movl %esp, %ebp
 
-		mov	ST_MEM_SIZE(%ebp), %ecx	# %ecx will hold the size
+		movl ST_MEM_SIZE(%ebp), %ecx	# %ecx will hold the size
 						# we are looking for (which is the first
 						# and only parameter)
-		mov	heap_begin, %eax	# %eax will hold the current
+		movl heap_begin, %eax	# %eax will hold the current
 						# search location
-		mov	current_break, %ebx	# %ebx will hold the current
+		movl current_break, %ebx	# %ebx will hold the current
 						# break
 
 alloc_loop_begin:				# here we iterate through each
 						# memory region
 
-		cmp	%ebx, %eax		# need more memory if these are equal
-		je	move_break
+		cmpl %ebx, %eax		# need more memory if these are equal
+		je move_break
 
 		# Grab the size of this memory
-		mov	HDR_SIZE_OFFSET(%eax), %edx
+		movl HDR_SIZE_OFFSET(%eax), %edx
 
 		# If the space is unavailable, go to the
-		cmp	$UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
-		je	next_location		# next one
+		cmpl $UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
+		je next_location		# next one
 
-		cmp	%edx, %ecx		# If the space is available, compare
-		jle	allocate_here		# the size to the needed size. If its
+		cmpl %edx, %ecx		# If the space is available, compare
+		jle allocate_here		# the size to the needed size. If its
 						# big enough, go to allocate_here
 
 next_location:
 
-		add	$HEADER_SIZE, %eax	# The total size of the memory
-		add	%edx, %eax		# region is the sum of the size
+		addl $HEADER_SIZE, %eax	# The total size of the memory
+		addl %edx, %eax		# region is the sum of the size
 						# requested (currently stored
 						# in %edx), plus another 8 bytes
 						# for the header (4 for the
@@ -183,13 +183,13 @@ allocate_here:					# if we’ve made it here,
 						# to allocate is in %eax
 		# Mark space as unavailable
 
-		mov	$UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
-		add	$HEADER_SIZE, %eax	# move %eax past the header to
+		movl $UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
+		addl $HEADER_SIZE, %eax	# move %eax past the header to
 						# the usable memory (since
 						# that’s what we return)
 
-		mov	%ebp, %esp		# return from the function
-		pop	%ebp
+		movl %ebp, %esp		# return from the function
+		popl %ebp
 		
 		ret
 
@@ -204,16 +204,16 @@ move_break:					# if we’ve made it here, that
 						# we need to increase %ebx to
 						# where we _want_ memory
 						# to end, so we
-		add	$HEADER_SIZE, %ebx	# add space for the headers
-		add	%ecx, %ebx		# add space to the break for
+		addl $HEADER_SIZE, %ebx	# add space for the headers
+		addl %ecx, %ebx		# add space to the break for
 						# the data requested
 						# now its time to ask Linux
 						# for more memory
-		push	%eax
-		push	%ecx
-		push	%ebx			# save needed registers
+		pushl %eax
+		pushl %ecx
+		pushl %ebx			# save needed registers
 
-		mov	$SYS_BRK, %eax		# reset the break (%ebx has
+		movl $SYS_BRK, %eax		# reset the break (%ebx has
 						# the requested break point)
 		int	$LINUX_SYSCALL
 
@@ -227,27 +227,27 @@ move_break:					# if we’ve made it here, that
 		# isn’t 0, we don’t care what it is
 		
 
-		cmp	$0, %eax		# check for error conditions
+		cmpl $0, %eax		# check for error conditions
 		je	error
-		pop	%ebx			# restore saved registers
-		pop	%ecx
+		popl %ebx			# restore saved registers
+		popl %ecx
 
-		pop	%eax
+		popl %eax
 		
 		# set this memory as unavailable, since we’re about to
 		# give it away
 
-		mov	$UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
+		movl $UNAVAILABLE, HDR_AVAIL_OFFSET(%eax)
 		
 		# set the size of the memory
 
-		mov	%ecx, HDR_SIZE_OFFSET(%eax)
+		movl %ecx, HDR_SIZE_OFFSET(%eax)
 
 		# move %eax to the actual start of usable memory.
 		# %eax now holds the return value
 		
-		add	$HEADER_SIZE, %eax
-		mov	%ebx, current_break	# save the new break
+		addl $HEADER_SIZE, %eax
+		movl %ebx, current_break	# save the new break
 
                 mov     %ebp, %esp              # return from the function
                 pop     %ebp
@@ -257,10 +257,10 @@ move_break:					# if we’ve made it here, that
 
 error:
 
-		mov	$0, %eax		# on error, we return zero
+		movl $0, %eax		# on error, we return zero
 
-		mov	%ebp, %esp
-		pop	%ebp
+		movl %ebp, %esp
+		popl %ebp
 		
 		ret
 ####### END OF FUNCTION #######
@@ -300,10 +300,10 @@ deallocate:
 # we didn’t push %ebp or move %esp to
 # %ebp, we can just do 4(%esp)
 
-		mov	ST_MEMORY_SEG(%esp), %eax
+		movl ST_MEMORY_SEG(%esp), %eax
 
 		# get the pointer to the real beginning of the memory
-		sub	$HEADER_SIZE, %eax
+		subl $HEADER_SIZE, %eax
 
 		# mark it as available
 		movl $AVAILABLE, HDR_AVAIL_OFFSET(%eax)
