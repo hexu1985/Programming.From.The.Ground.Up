@@ -19,29 +19,29 @@
 
 count_chars:
 	
-		push	%ebp
-		mov	%esp, %ebp
+		pushl %ebp
+		movl %esp, %ebp
 		
 		# Counter starts at zero
-		mov	$0, %ecx
-		mov	ST_STRING_START_ADDRESS(%ebp), %edx
+		movl $0, %ecx
+		movl ST_STRING_START_ADDRESS(%ebp), %edx
 
 	count_loop_begin:
 
 		movb	(%edx), %al	# Grab the current character
-		cmp	$0, %al		# Is it null?
+		cmpb $0, %al		# Is it null?
 		je	count_loop_end	# If yes, we’re done
-		inc	%ecx		# Otherwise, increment the counter and the pointer
-		inc	%edx
+		incl %ecx		# Otherwise, increment the counter and the pointer
+		incl %edx
 		jmp	count_loop_begin	# Go back to the beginning of the loop
 
 	count_loop_end:
 
-		mov	%ecx, %eax	# We’re done. Move the count into %eax
+		movl %ecx, %eax	# We’re done. Move the count into %eax
 					# and return.
 
-                mov     %ebp, %esp	# this line are absent in book, because of error
-                pop     %ebp
+                movl     %ebp, %esp	# this line are absent in book, because of error
+                popl     %ebp
 
 		ret
 

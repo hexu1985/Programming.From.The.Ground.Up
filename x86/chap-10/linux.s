@@ -32,8 +32,8 @@
 # create stack frame macro
 .macro	enter
 
-        push    %ebp
-        mov     %esp, %ebp
+        pushl    %ebp
+        movl     %esp, %ebp
 
 .endm
 

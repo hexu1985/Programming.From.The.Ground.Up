@@ -22,14 +22,14 @@
 
 integer2string:
 
-		push	%ebp		# Normal function beginning
-		mov	%esp, %ebp
+		pushl %ebp		# Normal function beginning
+		movl %esp, %ebp
 
-		mov	$0, %ecx	# Current character count
+		movl $0, %ecx	# Current character count
 
-		mov	ST_VALUE(%ebp), %eax	# Move the value into position
+		movl ST_VALUE(%ebp), %eax	# Move the value into position
 
-		mov	$10, %edi	# When we divide by 10, the 10
+		movl $10, %edi	# When we divide by 10, the 10
 					# must be in a register or memory location
 
 	conversion_loop:
@@ -38,13 +38,13 @@ integer2string:
 	# combined %edx:%eax register, so first
 	# clear out %edx
 
-		mov	$0, %edx
+		movl $0, %edx
 
 	# Divide %edx:%eax (which are implied) by 10.
 	# Store the quotient in %eax and the remainder
 	# in %edx (both of which are implied).
 
-		div	%edi
+		divl %edi
 
 	# Quotient is in the right place.  %edx has
 	# the remainder, which now needs to be converted
@@ -58,23 +58,23 @@ integer2string:
 	# instruction will give us the character for the
 	# number stored in %edx
 
-		add	$'0', %edx
+		addl $'0', %edx
 
-	# Now we will take this value and push it on the
+	# Now we will take this value and pushl it on the
 	# stack.  This way, when we are done, we can just
-	# pop off the characters one-by-one and they will
+	# popl off the characters one-by-one and they will
 	# be in the right order.  Note that we are pushing
 	# the whole register, but we only need the byte
 	# in %dl (the last byte of the %edx register) for
 	# the character.
 
-		push	%edx
-		inc	%ecx		# Increment the digit count
+		pushl %edx
+		incl %ecx		# Increment the digit count
 
 	# Check to see if %eax is zero yet, go to next
 	# step if so.
 
-		cmp	$0, %eax
+		cmpl $0, %eax
 		je	end_conversion_loop
 
 		jmp	conversion_loop	# %eax already has its new value.
@@ -82,29 +82,29 @@ integer2string:
 
 	end_conversion_loop:
 
-	# The string is now on the stack, if we pop it
+	# The string is now on the stack, if we popl it
 	# off a character at a time we can copy it into
 	# the buffer and be done.
 
 
-		mov	ST_BUFFER(%ebp), %edx	# Get the pointer to the buffer in %edx
+		movl ST_BUFFER(%ebp), %edx	# Get the pointer to the buffer in %edx
 
 	copy_reversing_loop:
 	
 	# We pushed a whole register, but we only need
-	# the last byte.  So we are going to pop off to
+	# the last byte.  So we are going to popl off to
 	# the entire %eax register, but then only move the
 	# small part (%al) into the character string.
 
-		pop	%eax
+		popl %eax
 		movb	%al, (%edx)
-		dec	%ecx		# Decreasing %ecx so we know when we are finished
+		decl %ecx		# Decreasing %ecx so we know when we are finished
 
 	# Increasing %edx so that it will be pointing to
 	# the next byte
 
-		inc	%edx
-		cmp	$0, %ecx		# Check to see if we are finished
+		incl %edx
+		cmpl $0, %ecx		# Check to see if we are finished
 		je	end_copy_reversing_loop	# If so, jump to the end of the function
 		jmp	copy_reversing_loop	# Otherwise, repeat the loop
 
@@ -112,6 +112,6 @@ integer2string:
 
 		movb	$0, (%edx)	# Done copying.  Now write a null byte and return
 
-		mov  %ebp, %esp
-		pop  %ebp
+		movl  %ebp, %esp
+		popl  %ebp
 		ret
