@@ -24,20 +24,20 @@ file_name:	.ascii	"test.dat\0"
 .equ	ST_INPUT_DESCRIPTOR,	-4
 .equ	ST_OUTPUT_DESCRIPTOR,	-8
 
-		mov	%esp, %ebp	# Copy the stack pointer to %ebp
-		sub	$8, %esp	# Allocate space to hold the file descriptors
+		movl %esp, %ebp	# Copy the stack pointer to %ebp
+		subl $8, %esp	# Allocate space to hold the file descriptors
 
 		# Open file
 
-		mov	$SYS_OPEN, %eax
-		mov	$file_name, %ebx
-		mov	$0, %ecx	#This says to open read-only
-		mov	$0666, %edx
+		movl $SYS_OPEN, %eax
+		movl $file_name, %ebx
+		movl $0, %ecx	#This says to open read-only
+		movl $0666, %edx
 		int	$LINUX_SYSCALL
 
 		# Save file descriptor
 		
-		mov	%eax, ST_INPUT_DESCRIPTOR(%ebp)
+		movl %eax, ST_INPUT_DESCRIPTOR(%ebp)
 		
 		# Even though it’s a constant, we are
 		# saving the output file descriptor in
@@ -49,10 +49,10 @@ file_name:	.ascii	"test.dat\0"
 
 	record_read_loop:
 
-		push	ST_INPUT_DESCRIPTOR(%ebp)
-		push	$record_buffer
+		pushl ST_INPUT_DESCRIPTOR(%ebp)
+		pushl $record_buffer
 		call	read_record
-		add	$8, %esp
+		addl $8, %esp
 
 		# Returns the number of bytes read.
 		# If it isn’t the same number we
@@ -60,31 +60,31 @@ file_name:	.ascii	"test.dat\0"
 		# end-of-file, or an error, so we’re
 		# quitting
 
-		cmp	$RECORD_SIZE, %eax
+		cmpl $RECORD_SIZE, %eax
 		jne	finished_reading
 		
 		# Otherwise, print out the first name
 		# but first, we must know it’s size
 		
-		push	$RECORD_FIRSTNAME + record_buffer
+		pushl $RECORD_FIRSTNAME + record_buffer
 		call	count_chars
-		add	$4, %esp
+		addl $4, %esp
 
-		mov	%eax, %edx
-		mov	ST_OUTPUT_DESCRIPTOR(%ebp), %ebx
-		mov	$SYS_WRITE, %eax
-		mov 	$RECORD_FIRSTNAME + record_buffer, %ecx
+		movl %eax, %edx
+		movl ST_OUTPUT_DESCRIPTOR(%ebp), %ebx
+		movl $SYS_WRITE, %eax
+		movl 	$RECORD_FIRSTNAME + record_buffer, %ecx
 		int	$LINUX_SYSCALL
 		
-		push	ST_OUTPUT_DESCRIPTOR(%ebp)
+		pushl ST_OUTPUT_DESCRIPTOR(%ebp)
 		call	write_newline
-		add	$4, %esp
+		addl $4, %esp
 		
 		jmp	record_read_loop
 		
 	finished_reading:
 
-		mov	$SYS_EXIT, %eax
-		mov	$0, %ebx
+		movl $SYS_EXIT, %eax
+		movl $0, %ebx
 		int	$LINUX_SYSCALL
 

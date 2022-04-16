@@ -26,21 +26,21 @@
 
 	read_record:
 
-		push	%ebp
-		mov	%esp, %ebp
-		push	%ebx
+		pushl %ebp
+		movl %esp, %ebp
+		pushl %ebx
 
-		mov	ST_FILEDES(%ebp), %ebx
-		mov	ST_READ_BUFFER(%ebp), %ecx
-		mov	$RECORD_SIZE, %edx
-		mov	$SYS_READ, %eax
+		movl ST_FILEDES(%ebp), %ebx
+		movl ST_READ_BUFFER(%ebp), %ecx
+		movl $RECORD_SIZE, %edx
+		movl $SYS_READ, %eax
 		int	$LINUX_SYSCALL
 
 # NOTE - %eax has the return value, which we will
 #        give back to our calling program
 
-		pop	%ebx
-		mov	%ebp, %esp
-		pop	%ebp
+		popl %ebx
+		movl %ebp, %esp
+		popl %ebp
 		ret
 

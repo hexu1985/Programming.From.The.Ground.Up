@@ -8,35 +8,35 @@
 
 	error_exit:
 			
-		push	%ebp
-		mov	%esp, %ebp
+		pushl %ebp
+		movl %esp, %ebp
 
 	# Write out error code
 
-		mov	ST_ERROR_CODE(%ebp), %ecx
-		push	%ecx
+		movl ST_ERROR_CODE(%ebp), %ecx
+		pushl %ecx
 		call	count_chars
-		pop	%ecx
-		mov	%eax, %edx
-		mov	$STDERR, %ebx
-		mov	$SYS_WRITE, %eax
+		popl %ecx
+		movl %eax, %edx
+		movl $STDERR, %ebx
+		movl $SYS_WRITE, %eax
 		int	$LINUX_SYSCALL
 
 	# Write out error message
 
-		mov	ST_ERROR_MSG(%ebp), %ecx
-		push	%ecx
+		movl ST_ERROR_MSG(%ebp), %ecx
+		pushl %ecx
 		call	count_chars
-		pop	%ecx
-		mov	%eax, %edx
-		mov	$STDERR, %ebx
-		mov	$SYS_WRITE, %eax
+		popl %ecx
+		movl %eax, %edx
+		movl $STDERR, %ebx
+		movl $SYS_WRITE, %eax
 		int	$LINUX_SYSCALL
-		push	$STDERR
+		pushl $STDERR
 		call	write_newline
 	
 	# Exit with status 1
 
-		mov	$SYS_EXIT, %eax
-		mov	$1, %ebx
+		movl $SYS_EXIT, %eax
+		movl $1, %ebx
 		int	$LINUX_SYSCALL

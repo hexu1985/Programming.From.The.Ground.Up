@@ -23,21 +23,21 @@
 
 write_record:
 		
-		push	%ebp
-		mov	%esp, %ebp
+		pushl %ebp
+		movl %esp, %ebp
 		
-		push	%ebx
-		mov	$SYS_WRITE, %eax
-		mov	ST_FILEDES(%ebp), %ebx
-		mov	ST_WRITE_BUFFER(%ebp), %ecx
-		mov	$RECORD_SIZE, %edx
+		pushl %ebx
+		movl $SYS_WRITE, %eax
+		movl ST_FILEDES(%ebp), %ebx
+		movl ST_WRITE_BUFFER(%ebp), %ecx
+		movl $RECORD_SIZE, %edx
 		int	$LINUX_SYSCALL
 
 # NOTE - %eax has the return value, which we will
 #        give back to our calling program
 
-		pop	%ebx
-		mov	%ebp, %esp
-		pop	%ebp
+		popl %ebx
+		movl %ebp, %esp
+		popl %ebp
 		ret
 
