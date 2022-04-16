@@ -15,12 +15,12 @@
 .POSIX:
 .SUFFIXES:
 
-AS ?= as
+AS = as
 ASFLAGS += --32
-LD ?= ld
+LD = ld
 LDFLAGS += -melf_i386
 
-CONVERSATIONPROGRAM ?= conversion-program
+CONVERSATIONPROGRAM = conversion-program
 CONVERSATIONPROGRAMOBJ := conversion-program.o
 
 INTEGERTOSTRINGOBJ := integer-to-string.o
@@ -35,20 +35,20 @@ WRITENEWLINEOGJ := write-newline.o
 all: conversion-program
 
 integer-to-string.o: integer-to-string.s
-	$(AS) $(ASFLAGS) $? -o $@
+	$(AS) $(ASFLAGS) $^ -o $@
 
 count-chars.o: count-chars.s
-	$(AS) $(ASFLAGS) $? -o $@
+	$(AS) $(ASFLAGS) $^ -o $@
 
 write-newline.o: write-newline.s
-	$(AS) $(ASFLAGS) $? -o $@
+	$(AS) $(ASFLAGS) $^ -o $@
 
 conversion-program.o: conversion-program.s
-	$(AS) $(ASFLAGS) $? -o $@
+	$(AS) $(ASFLAGS) $^ -o $@
 
 conversion-program: integer-to-string.o count-chars.o write-newline.o\
 	  conversion-program.o 
-	$(LD) $(LDFLAGS) $? -o $@
+	$(LD) $(LDFLAGS) $^ -o $@
 
 clean:
 	rm -f $(CONVERSATIONPROGRAM) $(CONVERSATIONPROGRAMOBJ) $(INTEGERTOSTRINGOBJ) $(COUNTCHARSOBJ) $(WRITENEWLINEOGJ)
