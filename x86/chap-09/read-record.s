@@ -28,18 +28,18 @@
 
 		enter
 
-		push	%ebx
+		pushl %ebx
 
-		mov	ST_FILEDES(%ebp), %ebx		# put file descriptor in ebx
-		mov	ST_READ_BUFFER(%ebp), %ecx	# address of buffer where we put readed data
-		mov	$RECORD_SIZE, %edx		# how many bytes we would read
-		mov	$SYS_READ, %eax			# 
+		movl ST_FILEDES(%ebp), %ebx		# put file descriptor in ebx
+		movl ST_READ_BUFFER(%ebp), %ecx	# address of buffer where we put readed data
+		movl $RECORD_SIZE, %edx		# how many bytes we would read
+		movl $SYS_READ, %eax			# 
 		int	$LINUX_SYSCALL
 
 # NOTE - %eax has the return value, which we will
 #        give back to our calling program
 
-		pop	%ebx
+		popl %ebx
 
 		leave
 

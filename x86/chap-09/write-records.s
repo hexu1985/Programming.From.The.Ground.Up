@@ -9,7 +9,7 @@
 # .rept is used to pad each item. .rept tells
 # the assembler to repeat the section between
 # .rept and .endr the number of times specified.
-# This is used in this program to add extra null
+# This is used in this program to addl extra null
 # characters at the end of each field to fill
 # it up
 
@@ -100,23 +100,23 @@ file_name:	.ascii	"test.dat\0"	#This is the name of the file we will write to
 	
 	_start:
 
-		mov	%esp, %ebp	# Copy the stack pointer to %ebp
-		sub	$4, %esp	# Allocate space to hold the file descriptor
+		movl %esp, %ebp	# Copy the stack pointer to %ebp
+		subl $4, %esp	# Allocate space to hold the file descriptor
 
-		mov	ST_ARGC(%ebp), %eax	# put number of arguments in eax
-		mov	ST_ARGV_1(%ebp), %ebx	# define filename
-		cmp	$2, %eax		# we always have at least one argument
+		movl ST_ARGC(%ebp), %eax	# put number of arguments in eax
+		movl ST_ARGV_1(%ebp), %ebx	# define filename
+		cmpl $2, %eax		# we always have at least one argument
 		jge	open_fd_read		# if we have arguments then open a file
 	
-		mov	$file_name, %ebx	# if we do not have arguments, put
+		movl $file_name, %ebx	# if we do not have arguments, put
 						# defined filename in ebx
 	open_fd_read:
 
-		mov	$SYS_OPEN, %eax	# open the file
-		mov	$0101, %ecx	# This says to create if it
+		movl $SYS_OPEN, %eax	# open the file
+		movl $0101, %ecx	# This says to create if it
 					# doesn’t exist, and open for
 					# writing
-		mov	$0666, %edx
+		movl $0666, %edx
 		int	$LINUX_SYSCALL
 
                 test    %eax, %eax              # check if eax is zero
@@ -127,41 +127,41 @@ file_name:	.ascii	"test.dat\0"	#This is the name of the file we will write to
 
         no_error:
 
-		mov	%eax, ST_FILE_DESCRIPTOR(%ebp)	# Store the file descriptor away
+		movl %eax, ST_FILE_DESCRIPTOR(%ebp)	# Store the file descriptor away
 
 		# Write the first record
-		push	ST_FILE_DESCRIPTOR(%ebp)
-		push	$record1
+		pushl ST_FILE_DESCRIPTOR(%ebp)
+		pushl $record1
 		call	write_record
-		add	$8, %esp
+		addl $8, %esp
 		
 		# Write the second record
-		push    ST_FILE_DESCRIPTOR(%ebp)
-                push    $record2
+		pushl    ST_FILE_DESCRIPTOR(%ebp)
+                pushl    $record2
                 call    write_record
-                add     $8, %esp
+                addl     $8, %esp
 
                 # Write the third record
-                push    ST_FILE_DESCRIPTOR(%ebp)
-                push    $record3
+                pushl    ST_FILE_DESCRIPTOR(%ebp)
+                pushl    $record3
                 call    write_record
-                add     $8, %esp
+                addl     $8, %esp
 
 		# Write the forth record
-		push    ST_FILE_DESCRIPTOR(%ebp)
-                push    $record4
+		pushl    ST_FILE_DESCRIPTOR(%ebp)
+                pushl    $record4
                 call    write_record
-                add     $8, %esp
+                addl     $8, %esp
 
 
 		# Close the file descriptor
-		mov	$SYS_CLOSE, %eax
-		mov	ST_FILE_DESCRIPTOR(%ebp), %ebx
+		movl $SYS_CLOSE, %eax
+		movl ST_FILE_DESCRIPTOR(%ebp), %ebx
 		int	$LINUX_SYSCALL
 
-		xor	%ebx, %ebx
+		xorl %ebx, %ebx
 
 	exit:
 		# Exit the program
-		mov	$SYS_EXIT, %eax
+		movl $SYS_EXIT, %eax
 		int     $LINUX_SYSCALL

@@ -20,18 +20,18 @@ output_file_name:	.ascii "testout.dat\0"
 .globl	_start
 	_start:
 		
-		mov	%esp, %ebp	# Copy stack pointer and make room for local variables
-		sub	$8, %esp
+		movl %esp, %ebp	# Copy stack pointer and make room for local variables
+		subl $8, %esp
 		
 		# Open file for reading
 
-		mov	$SYS_OPEN, %eax
-		mov	$input_file_name, %ebx
-		mov	$0, %ecx
-		mov	$0666, %edx
+		movl $SYS_OPEN, %eax
+		movl $input_file_name, %ebx
+		movl $0, %ecx
+		movl $0666, %edx
 		int	$LINUX_SYSCALL
 
-		mov	%eax, ST_INPUT_DESCRIPTOR(%ebp)
+		movl %eax, ST_INPUT_DESCRIPTOR(%ebp)
 		
 		# This will test and see if %eax is
 		# negative. If it is not negative, it
@@ -40,7 +40,7 @@ output_file_name:	.ascii "testout.dat\0"
 		# condition that the negative number
 		# represents.
 		
-		cmp $0, %eax
+		cmpl $0, %eax
 		jg	continue_processing
 
         call    error_handler
@@ -48,8 +48,8 @@ output_file_name:	.ascii "testout.dat\0"
 
     exit:
 
-        mov $SYS_EXIT, %eax
-        mov $0, %ebx
+        movl $SYS_EXIT, %eax
+        movl $0, %ebx
         int $LINUX_SYSCALL
 		
 
@@ -57,20 +57,20 @@ output_file_name:	.ascii "testout.dat\0"
 
 		# Open file for writning
 
-		mov	$SYS_OPEN, %eax
-		mov	$output_file_name, %ebx
-		mov	$0101, %ecx
-		mov	$0666, %edx
+		movl $SYS_OPEN, %eax
+		movl $output_file_name, %ebx
+		movl $0101, %ecx
+		movl $0666, %edx
 		int	$LINUX_SYSCALL
 
-		mov	%eax, ST_OUTPUT_DESCRIPTOR(%ebp)
+		movl %eax, ST_OUTPUT_DESCRIPTOR(%ebp)
 
 	loop_begin:
 
-		push	ST_INPUT_DESCRIPTOR(%ebp)
-		push	$record_buffer
+		pushl ST_INPUT_DESCRIPTOR(%ebp)
+		pushl $record_buffer
 		call	read_record
-		add	$8, %esp
+		addl $8, %esp
 
 		# Returns the number of bytes read.
 		# If it isn’t the same number we
@@ -78,7 +78,7 @@ output_file_name:	.ascii "testout.dat\0"
 		# end-of-file, or an error, so we’re
 		# quitting
 		
-		cmp	$RECORD_SIZE, %eax
+		cmpl $RECORD_SIZE, %eax
 		jne	loop_end
 
 		# Increment the age
@@ -87,16 +87,16 @@ output_file_name:	.ascii "testout.dat\0"
 
 		# Write the record out
 
-		push	ST_OUTPUT_DESCRIPTOR(%ebp)
-		push	$record_buffer
+		pushl ST_OUTPUT_DESCRIPTOR(%ebp)
+		pushl $record_buffer
 		call	write_record
-		add	$8, %esp
+		addl $8, %esp
 		
 		jmp	loop_begin
 
 	loop_end:
 
-		mov	$SYS_EXIT, %eax
-		mov	$0, %ebx
+		movl $SYS_EXIT, %eax
+		movl $0, %ebx
 		int	$LINUX_SYSCALL
 

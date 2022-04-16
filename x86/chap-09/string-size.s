@@ -14,8 +14,8 @@
 # create stack frame macro
 .macro  enter
 
-        push    %ebp
-        mov     %esp, %ebp
+        pushl    %ebp
+        movl     %esp, %ebp
 
 .endm
 
@@ -28,16 +28,16 @@
 
 		enter
 
-		mov	8(%ebp), %edi	# address of our string
-		mov	12(%ebp), %eax	# end of a string symbol
+		movl 8(%ebp), %edi	# address of our string
+		movl 12(%ebp), %eax	# end of a string symbol
 
-		push	%edi
-		push	%edi
-		pop	%esi		# begin of our string in %esi
+		pushl %edi
+		pushl %edi
+		popl %esi		# begin of our string in %esi
 		repne	scasb		# scaning a string for 0x00 byte
-		sub	%esi, %edi	# substract start address from end address
-		mov	%edi, %edx	# put lenght of a string 
-		pop	%ecx
+		subl %esi, %edi	# substract start address from end address
+		movl %edi, %edx	# put lenght of a string 
+		popl %ecx
 		
 		leave
 

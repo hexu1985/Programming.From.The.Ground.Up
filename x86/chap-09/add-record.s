@@ -36,95 +36,95 @@ enter_your_address:	.asciz	"Enter your address: "
 .globl	_start
 	_start:
 		
-		mov	%esp, %ebp		# Copy stack pointer and make room for local variables
-		sub	$8, %esp
+		movl %esp, %ebp		# Copy stack pointer and make room for local variables
+		subl $8, %esp
 
-                mov     ST_ARGC(%ebp), %eax     # put number of arguments in eax
-                mov     ST_ARGV_1(%ebp), %ebx   # define filename
-                cmp     $2, %eax                # we always have at least one argument
+                movl     ST_ARGC(%ebp), %eax     # put number of arguments in eax
+                movl     ST_ARGV_1(%ebp), %ebx   # define filename
+                cmpl     $2, %eax                # we always have at least one argument
                 jge     open_fd_read_and_write  # if we have arguments then open a file
 
-                mov     $input_file_name, %ebx  # if we do not have arguments, put
+                movl     $input_file_name, %ebx  # if we do not have arguments, put
                                                 # defined filename in ebx
 
         open_fd_read_and_write:
 
                 # Open file for reading and writening
 
-                mov     $SYS_OPEN, %eax         # open file
-                mov     $2, %ecx                # This says to open read and write
-                mov     $0666, %edx             # file permissions
+                movl     $SYS_OPEN, %eax         # open file
+                movl     $2, %ecx                # This says to open read and write
+                movl     $0666, %edx             # file permissions
                 int     $LINUX_SYSCALL
 		test    %eax, %eax              # check if eax is zero
                 jl      error
 
-                mov     %eax, ST_INPUT_DESCRIPTOR(%ebp)
-                xor     %eax, %eax
+                movl     %eax, ST_INPUT_DESCRIPTOR(%ebp)
+                xorl     %eax, %eax
 
-		xor	%eax, %eax		# end-of-string symbol
-		push	%eax			
-		mov	$enter_name, %ecx	# "counter"
-		push	%ecx			
+		xorl %eax, %eax		# end-of-string symbol
+		pushl %eax			
+		movl $enter_name, %ecx	# "counter"
+		pushl %ecx			
 
 		call	string_size	
-		add	$8, %esp
+		addl $8, %esp
 
 		call	show_message
 		test    %eax, %eax              # check if eax is zero
                 jl      error
 
-		xor	%eax, %eax		
-		mov	$chunk, %edi		# our buffer where we store information
-		mov	$RECORD_AGE, %ecx	# size our chunk without age
+		xorl %eax, %eax		
+		movl $chunk, %edi		# our buffer where we store information
+		movl $RECORD_AGE, %ecx	# size our chunk without age
 		repnz	stosw			# fill our chunk with zeroes
 	
-		mov	$RECORD_LASTNAME, %edx	# put size of our first field in %edx
-		dec	%edx			# because we always have to end our record with 0x00
-		mov	$chunk, %ecx		# put address of our chunk into %eax
+		movl $RECORD_LASTNAME, %edx	# put size of our first field in %edx
+		decl %edx			# because we always have to end our record with 0x00
+		movl $chunk, %ecx		# put address of our chunk into %eax
 		
 		call	read_kbd
                 test    %eax, %eax              # check if eax is zero
                 jl      error
 
-		xor	%eax, %eax
-		push	%eax
-		mov	$enter_surname, %ecx
-		push	%ecx
+		xorl %eax, %eax
+		pushl %eax
+		movl $enter_surname, %ecx
+		pushl %ecx
 
 		call	string_size
-		add	$8, %esp
+		addl $8, %esp
 
 		call	show_message
                 test    %eax, %eax              # check if eax is zero
                 jl      error
 
 
-		mov	$RECORD_LASTNAME, %ebx	# put size of our first field in %ebx
-		push	%ebx			# save it 
+		movl $RECORD_LASTNAME, %ebx	# put size of our first field in %ebx
+		pushl %ebx			# save it 
 		leal	chunk(,%ebx,1),	%ecx	# save address of our second record in %ecx
-		pop	%edx			# restore size
-		dec	%edx			# because we always have to end our record with 0x00
+		popl %edx			# restore size
+		decl %edx			# because we always have to end our record with 0x00
 
 		call    read_kbd
                 test    %eax, %eax              # check if eax is zero
                 jl      error
 
-                xor     %eax, %eax
-                push    %eax
-                mov     $enter_your_address, %ecx
-                push    %ecx
+                xorl     %eax, %eax
+                pushl    %eax
+                movl     $enter_your_address, %ecx
+                pushl    %ecx
 
                 call    string_size
-                add     $8, %esp
+                addl     $8, %esp
 
                 call    show_message
                 test    %eax, %eax              # check if eax is zero
                 jl      error
 
-		mov	$RECORD_AGE, %edx	# take record age position
-		sub	$RECORD_ADDRESS, %edx	# substract it from record address position
-		dec	%edx			# we have 320-80-1 = 239 byte record field
-		mov	$RECORD_ADDRESS, %ebx	# skip 80 bytes
+		movl $RECORD_AGE, %edx	# take record age position
+		subl $RECORD_ADDRESS, %edx	# substract it from record address position
+		decl %edx			# we have 320-80-1 = 239 byte record field
+		movl $RECORD_ADDRESS, %ebx	# skip 80 bytes
 		leal	chunk(,%ebx,1), %ecx
 
 		call	read_kbd
@@ -134,14 +134,14 @@ enter_your_address:	.asciz	"Enter your address: "
 		
 	last_field:				# this marker for debugging only
 
-                mov     $RECORD_AGE, %ebx	# our last field
+                movl     $RECORD_AGE, %ebx	# our last field
                 leal    chunk(,%ebx,1), %ecx	# skip 320 bytes
                 movl    $33, (%ecx)		# put our age to the last field
 
-		xor	%ecx, %ecx		# offset
-		inc	%ecx			# 1
+		xorl %ecx, %ecx		# offset
+		incl %ecx			# 1
 		call	lseek			# move pointer
-                add     $8, %esp
+                addl     $8, %esp
 
 		test    %eax, %eax              # check if eax is zero
                 jl      error
@@ -149,45 +149,45 @@ enter_your_address:	.asciz	"Enter your address: "
 
 	append_to_file:
 
-		mov	$SYS_WRITE, %eax
-		mov	ST_INPUT_DESCRIPTOR(%ebp), %ebx # in a file
-		mov	$chunk, %ecx			# buffer with our information
-		mov	$RECORD_SIZE, %edx		# buffer size
+		movl $SYS_WRITE, %eax
+		movl ST_INPUT_DESCRIPTOR(%ebp), %ebx # in a file
+		movl $chunk, %ecx			# buffer with our information
+		movl $RECORD_SIZE, %edx		# buffer size
 		int	$LINUX_SYSCALL
 
                 test    %eax, %eax              # check if eax is zero
                 jl      error
 
-		mov	$SYS_CLOSE, %eax		# close file
-		mov	ST_INPUT_DESCRIPTOR(%ebp), %ebx
+		movl $SYS_CLOSE, %eax		# close file
+		movl ST_INPUT_DESCRIPTOR(%ebp), %ebx
 		int	$LINUX_SYSCALL
 
 	exit:
 
-		mov	$SYS_EXIT, %eax
-		mov	$0, %ebx
+		movl $SYS_EXIT, %eax
+		movl $0, %ebx
 		int	$LINUX_SYSCALL
 
 	lseek:
 
-                mov     $0x13, %eax                     # set position of a record
-                mov     ST_INPUT_DESCRIPTOR(%ebp), %ebx # in a file
-                mov     $0x02, %edx                     # at the end of a file
+                movl     $0x13, %eax                     # set position of a record
+                movl     ST_INPUT_DESCRIPTOR(%ebp), %ebx # in a file
+                movl     $0x02, %edx                     # at the end of a file
                 int     $LINUX_SYSCALL
 		ret
 
 
 	show_message:
 
-		mov	$0x04, %eax		# write to
-		mov	$0x01, %ebx		# stdout
+		movl $0x04, %eax		# write to
+		movl $0x01, %ebx		# stdout
 		int	$0x80
 		ret
 	
 	read_kbd:
 
-		mov	$0x03, %eax		# read
-		xor	%ebx, %ebx		# from stdin
+		movl $0x03, %eax		# read
+		xorl %ebx, %ebx		# from stdin
 		int	$0x80		
 		ret
 

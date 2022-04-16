@@ -26,35 +26,35 @@ record_buffer_ptr:	.long	0
 .equ	ST_INPUT_DESCRIPTOR,	-4
 .equ	ST_OUTPUT_DESCRIPTOR,	-8
 
-		mov	%esp, %ebp	# Copy the stack pointer to %ebp
-		sub	$8, %esp	# Allocate space to hold the file descriptors
+		movl %esp, %ebp	# Copy the stack pointer to %ebp
+		subl $8, %esp	# Allocate space to hold the file descriptors
 
-		mov	ST_ARGC(%ebp), %eax	# put number of arguments in eax
-		mov	ST_ARGV_1(%ebp), %ebx	# define filename
-		cmp	$2, %eax		# we always have at least one argument
+		movl ST_ARGC(%ebp), %eax	# put number of arguments in eax
+		movl ST_ARGV_1(%ebp), %ebx	# define filename
+		cmpl $2, %eax		# we always have at least one argument
 		jge	open_fd_read		# if we have arguments then open a file
 	
-		mov	$file_name, %ebx	# if we do not have arguments, put
+		movl $file_name, %ebx	# if we do not have arguments, put
 						# defined filename in ebx
 
 	open_fd_read:
 
-		mov	$SYS_OPEN, %eax		# open file
-		mov	$0, %ecx		# This says to open read-only
-		mov	$0666, %edx		# file permissions
+		movl $SYS_OPEN, %eax		# open file
+		movl $0, %ecx		# This says to open read-only
+		movl $0666, %edx		# file permissions
 		int	$LINUX_SYSCALL
 		
 		test	%eax, %eax		# check if eax is zero
 		jge	no_error
 
-		add	$8, %esp
+		addl $8, %esp
 		call	error_handler
 		jmp	exit
 
 
 	no_error:
 
-		mov	%eax, ST_INPUT_DESCRIPTOR(%ebp)	# Save file descriptor
+		movl %eax, ST_INPUT_DESCRIPTOR(%ebp)	# Save file descriptor
 		
 		# Even though it’s a constant, we are
 		# saving the output file descriptor in
@@ -66,14 +66,14 @@ record_buffer_ptr:	.long	0
 
 	record_read_loop:
 
-		push	$RECORD_SIZE
+		pushl $RECORD_SIZE
 		call	allocate
-		mov	%eax, record_buffer_ptr
+		movl %eax, record_buffer_ptr
 
-		push	ST_INPUT_DESCRIPTOR(%ebp)
-		push	record_buffer_ptr
+		pushl ST_INPUT_DESCRIPTOR(%ebp)
+		pushl record_buffer_ptr
 		call	read_record
-		add	$8, %esp
+		addl $8, %esp
 
 		# Returns the number of bytes read.
 		# If it isn’t the same number we
@@ -81,45 +81,45 @@ record_buffer_ptr:	.long	0
 		# end-of-file, or an error, so we’re
 		# quitting
 
-		cmp	$RECORD_SIZE, %eax
+		cmpl $RECORD_SIZE, %eax
 		jne	finished_reading
 		
 		# Otherwise, print out the first name
 		# but first, we must know it’s size
 		
-		mov	record_buffer_ptr, %eax
-		add	$RECORD_FIRSTNAME, %eax
-		push	%eax
+		movl record_buffer_ptr, %eax
+		addl $RECORD_FIRSTNAME, %eax
+		pushl %eax
 		call	count_chars
-		add	$4, %esp
+		addl $4, %esp
 
-		mov	%eax, %edx
-		mov	ST_OUTPUT_DESCRIPTOR(%ebp), %ebx
-		mov	$SYS_WRITE, %eax
+		movl %eax, %edx
+		movl ST_OUTPUT_DESCRIPTOR(%ebp), %ebx
+		movl $SYS_WRITE, %eax
 
-		mov	record_buffer_ptr, %ecx
-		add	$RECORD_FIRSTNAME, %ecx
+		movl record_buffer_ptr, %ecx
+		addl $RECORD_FIRSTNAME, %ecx
 		int	$LINUX_SYSCALL
 		
-		push	ST_OUTPUT_DESCRIPTOR(%ebp)
+		pushl ST_OUTPUT_DESCRIPTOR(%ebp)
 		call	write_newline
-		add	$4, %esp
+		addl $4, %esp
 		
 		jmp	record_read_loop
 		
 	finished_reading:
 
-		mov	ST_INPUT_DESCRIPTOR(%ebp), %ebx		# Close file
-		mov	$SYS_CLOSE, %eax
+		movl ST_INPUT_DESCRIPTOR(%ebp), %ebx		# Close file
+		movl $SYS_CLOSE, %eax
 		int	$LINUX_SYSCALL	
 
-		xor	%ebx, %ebx				# our exit code
+		xorl %ebx, %ebx				# our exit code
 	
-		push	record_buffer_ptr
+		pushl record_buffer_ptr
 		call	deallocate
 
 	exit:
 	
-		mov	$SYS_EXIT, %eax				# exit to OS
+		movl $SYS_EXIT, %eax				# exit to OS
 		int	$LINUX_SYSCALL
 

@@ -39,6 +39,6 @@ success_message:	.ascii	"Hey diddle diddle!\n"
 		int	$0x80
 
 		movl $0x1, %eax		# exit to linux
-		xor	%ebx, %ebx		# exit code
+		xorl %ebx, %ebx		# exit code
 		int	$0x80
 

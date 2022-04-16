@@ -22,21 +22,21 @@ count_chars:
 	
 		enter
 	
-		xor	%ecx, %ecx	# Counter starts at zero
-		mov	ST_STRING_START_ADDRESS(%ebp), %edx	# put begin address of our string in edx	
+		xorl %ecx, %ecx	# Counter starts at zero
+		movl ST_STRING_START_ADDRESS(%ebp), %edx	# put begin address of our string in edx	
 
 	count_loop_begin:
 
 		movb	(%edx), %al	# Grab the current character
 		test	%al, %al	# Is it null?
 		jz	count_loop_end	# If yes, we’re done
-		inc	%ecx		# Otherwise, increment the counter and the pointer
-		inc	%edx
+		incl %ecx		# Otherwise, increment the counter and the pointer
+		incl %edx
 		jmp	count_loop_begin	# Go back to the beginning of the loop
 
 	count_loop_end:
 
-		mov	%ecx, %eax	# We’re done. Move the count into %eax
+		movl %ecx, %eax	# We’re done. Move the count into %eax
 					# and return.
 
 		leave

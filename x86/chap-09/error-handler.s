@@ -162,170 +162,170 @@ error_number:	.int	34
 
 error_handler:
 		neg	%eax				# change sign of error code
-		dec	%eax				# because arrays starts from 0
-		cmp	error_number, %eax
+		decl %eax				# because arrays starts from 0
+		cmpl error_number, %eax
 		jg	unknown_error			# is this an error code we know about?
-		mov	error_list(,%eax,4), %eax	# load error message
+		movl error_list(,%eax,4), %eax	# load error message
 		jmp	%eax
 
 	_eperm:
-		mov     $eperm_message, %ecx      	# display string
+		movl     $eperm_message, %ecx      	# display string
 		jmp	show_error
 
 	_enoent:
-		mov	$enoent_message, %ecx
+		movl $enoent_message, %ecx
 		jmp	show_error
 
 	_esrch:
-		mov	$esrch_message, %ecx
+		movl $esrch_message, %ecx
 		jmp	show_error
 
 	_eintr:
-		mov	$eintr_message, %ecx
+		movl $eintr_message, %ecx
 		jmp	show_error
 
 	_eio:
-		mov	$eio_message, %ecx
+		movl $eio_message, %ecx
 		jmp	show_error
 
 	_enxio:
-		mov	$enxio_message, %ecx
+		movl $enxio_message, %ecx
 		jmp	show_error
 
 	_e2big:
-		mov	$e2big_message, %ecx
+		movl $e2big_message, %ecx
 		jmp	show_error
 
 	_enoexec:
-		mov	$enoexec_message, %ecx
+		movl $enoexec_message, %ecx
 		jmp	show_error
 
 	_ebadf:
-		mov	$ebadf_message, %ecx
+		movl $ebadf_message, %ecx
 		jmp	show_error
 
 	_echild:
-		mov	$echild_message, %ecx
+		movl $echild_message, %ecx
 		jmp	show_error
 
 	_eagain:
-		mov	$eagain_message, %ecx
+		movl $eagain_message, %ecx
 		jmp	show_error
 
 	_enomem:
-		mov	$enomem_message, %ecx
+		movl $enomem_message, %ecx
 		jmp	show_error
 
 	_eacces:
-		mov	$eacces_message, %ecx
+		movl $eacces_message, %ecx
 		jmp	show_error
 
 	_efault:
-		mov	$efault_message, %ecx
+		movl $efault_message, %ecx
 		jmp	show_error
 	
 	_enotblk:
-		mov     $enotblk_message, %ecx
+		movl     $enotblk_message, %ecx
                 jmp     show_error
 
 	_ebusy:
-		mov	$ebusy_message, %ecx
+		movl $ebusy_message, %ecx
 		jmp	show_error
 
 	_eexist:
-		mov	$eexist_message, %ecx
+		movl $eexist_message, %ecx
 		jmp	show_error
 
 	_exdev:
-		mov	$exdev_message, %ecx
+		movl $exdev_message, %ecx
 		jmp	show_error
 
 	_enodev:
-		mov	$enodev_message, %ecx
+		movl $enodev_message, %ecx
 		jmp	show_error
 
 	_enotdir:
-		mov	$enotdir_message, %ecx
+		movl $enotdir_message, %ecx
 		jmp	show_error
 
 	_eisdir:
-		mov	$eisdir_message, %ecx
+		movl $eisdir_message, %ecx
 		jmp	show_error
 
 	_einval:
-		mov	$einval_message, %ecx
+		movl $einval_message, %ecx
 		jmp	show_error
 
 	_enfile:
-		mov	$enfile_message, %ecx
+		movl $enfile_message, %ecx
 		jmp	show_error
 
 	_emfile:
-		mov	$emfile_message, %ecx
+		movl $emfile_message, %ecx
 		jmp	show_error
 
 	_enotty:
-		mov	$enotty_message, %ecx
+		movl $enotty_message, %ecx
 		jmp	show_error
 
 	_etxtbsy:
-		mov	$etxtbsy_message, %ecx
+		movl $etxtbsy_message, %ecx
 		jmp	show_error
 
 	_efbig:
-		mov	$efbig_message, %ecx
+		movl $efbig_message, %ecx
 		jmp	show_error
 
 	_enospc:
-		mov	$enospc_message, %ecx
+		movl $enospc_message, %ecx
 		jmp	show_error
 
 	_espipe:
-		mov	$espipe_message, %ecx
+		movl $espipe_message, %ecx
 		jmp	show_error
 
 	_erofs:
-		mov	$erofs_message, %ecx
+		movl $erofs_message, %ecx
 		jmp	show_error
 
 	_emlink:
-		mov	$emlink_message, %ecx
+		movl $emlink_message, %ecx
 		jmp	show_error
 
 	_epipe:
-		mov	$epipe_message, %ecx
+		movl $epipe_message, %ecx
 		jmp	show_error
 
 	_edom:
-		mov	$edom_message, %ecx
+		movl $edom_message, %ecx
 		jmp	show_error
 
 	_erange:
-		mov	$erange_message, %ecx
+		movl $erange_message, %ecx
 		jmp	show_error
 
 	unknown_error:
 
-		mov	$unknown_message, %ecx
+		movl $unknown_message, %ecx
 
 	show_error:
 		
-		push	%eax
+		pushl %eax
 
-                xor     %eax, %eax		# end of a string symbol in %al 
-                push    %eax			# push end of a string symbol
-                push    %ecx			# push string
+                xorl     %eax, %eax		# end of a string symbol in %al 
+                pushl    %eax			# pushl end of a string symbol
+                pushl    %ecx			# pushl string
                 call    string_size		# calculate string size
-		add	$8, %esp
+		addl $8, %esp
 
-		mov     $0x04, %eax             # write to
-                mov     $0x01, %ebx             # stdout
+		movl     $0x04, %eax             # write to
+                movl     $0x01, %ebx             # stdout
                 int     $0x80
 
 # NOTE - %ebx has the return value, which we will
 #        give back to our calling program
 
-		pop	%ebx
+		popl %ebx
 
 		ret
 

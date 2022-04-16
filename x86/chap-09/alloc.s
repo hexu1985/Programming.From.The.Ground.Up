@@ -5,7 +5,7 @@
 #        for a certain size of memory. We actually
 #        use more than that size, but we put it
 #        at the beginning, before the pointer
-#        we hand back. We add a size field and
+#        we hand back. We addl a size field and
 #        an AVAILABLE/UNAVAILABLE marker. So, the
 #        memory looks like this
 #
@@ -204,8 +204,8 @@ move_break:					# if we’ve made it here, that
 						# we need to increase %ebx to
 						# where we _want_ memory
 						# to end, so we
-		addl $HEADER_SIZE, %ebx	# add space for the headers
-		addl %ecx, %ebx		# add space to the break for
+		addl $HEADER_SIZE, %ebx	# addl space for the headers
+		addl %ecx, %ebx		# addl space to the break for
 						# the data requested
 						# now its time to ask Linux
 						# for more memory
@@ -249,8 +249,8 @@ move_break:					# if we’ve made it here, that
 		addl $HEADER_SIZE, %eax
 		movl %ebx, current_break	# save the new break
 
-                mov     %ebp, %esp              # return from the function
-                pop     %ebp
+                movl     %ebp, %esp              # return from the function
+                popl     %ebp
 
                 ret
 
@@ -297,7 +297,7 @@ deallocate:
 
 # get the address of the memory to free
 # (normally this is 8(%ebp), but since
-# we didn’t push %ebp or move %esp to
+# we didn’t pushl %ebp or move %esp to
 # %ebp, we can just do 4(%esp)
 
 		movl ST_MEMORY_SEG(%esp), %eax
